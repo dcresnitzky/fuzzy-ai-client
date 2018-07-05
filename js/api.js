@@ -27,7 +27,7 @@ Api.post = function(payload, success, error) {
     },
     url: "https://api.fuzzy.ai/agent/X6WUL3TME3KLY4YIGENO7UJZEE",
     data: payload,
-    success: callback,
+    success: success,
     fail : error,
   });
 

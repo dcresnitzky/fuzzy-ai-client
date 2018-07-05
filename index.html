@@ -18,7 +18,9 @@
   </head>
 
   <body>
-    <!--[if lte IE 9]>
+    <div class="loader" data-bind="visible: showLoading()"></div>
+
+  <!--[if lte IE 9]>
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
     <![endif]-->
 
@@ -37,9 +39,9 @@
         </a>
     </div>
 
-    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-      <h1 class="display-4">Pricing</h1>
-      <p class="lead">Quickly build an effective pricing table for your potential customers with this Bootstrap example. It's built with default Bootstrap components and utilities with little customization.</p>
+    <div class="pricing-header px-3 py-3 pb-md-4 mx-auto text-center">
+      <h1 class="display-4">Vendas</h1>
+      <p class="lead">Os três cards abaixo são lojas que nos enviaram vendas suspeitas para avaliarmos. Dentro dos cards estão as informações da venda e de seus respectivos clientes.</p>
     </div>
 
     <div class="container">
@@ -54,30 +56,29 @@
           <div class="card-body" data-bind="with: customer">
             <img class="img-circle box-shadow" data-bind="attr: { src : avatar }">
             <h1 class="card-title" data-bind="text: name"> </h1>
+            <span style="font-size:14px" data-bind="text:email"></span>
+
             <div class="entry-content">
               <ul>
                 <!--registration countries match-->
-                <li><strong>Pais de Compra:</strong> <span data-bind="text: countryOfRegistration"></span></li>
-                <li data-bind="text: countryOfCharge"></li>
+                <li><strong>Pais da Cobrança:</strong> <span data-bind="text: countryOfRegistration, attr: { style: highRiskCountry ? 'color :red' : 'color: inherit'}"></span></li>
+                <li><strong>Pais Registrado:</strong> <span data-bind="text: countryOfCharge"></span></li>
                 <!--time of charge-->
-                <li data-bind="text: timeOfCharge"></li>
-                <!--ip countries match-->
-                <li data-bind="text: timeOfCharge"></li>
-                <!--previous purchases-->
-                <li><strong>Free</strong> option 4</li>
-                <!--time since registration-->
-                <li><strong>Unlimited</strong> option 5</li>
+                <li><strong>Hora da Compra:</strong> <span data-bind="text: timeOfCharge + ':00', attr: { style: criticalTime ? 'color :red' : 'color: inherit'} "></span></li>
                 <!--purchase size-->
-
-                <!--high risk country-->
-
-                <!--free email-->
-
-                <!--web proxy-->
+                <li><strong>Valor da Compra:</strong> <span data-bind="text: 'R$ '+ purchaseValue +',00'"></span></li>
+                <!--previous purchases-->
+                <!--time since registration-->
+                <!-- ko if: timeSinceRegistration > 0 -->
+                <li><strong>Usuario há:</strong> <span data-bind="text:Math.ceil(timeSinceRegistration/24)"></span> dias</li>
+                <!-- /ko -->
+                <!-- ko if: timeSinceRegistration <= 0 -->
+                <li><strong>Usuario novo</strong></li>
+                <!-- /ko -->
 
               </ul>
             </div>
-            <button type="button" class="btn btn-lg btn-block btn-outline-primary" style="margin-top: 15px;">Realizar o Teste</button>
+            <button type="button" class="btn btn-lg btn-block btn-outline-primary" style="margin-top: 15px;" data-bind="click:evaluate">Realizar o Teste</button>
           </div>
         </div>
 

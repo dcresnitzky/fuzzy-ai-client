@@ -77,8 +77,9 @@ function getRiskCountries() {
 
 }
 
-var Store = function() {
+var Store = function(parent) {
   var self = this;
+  self.parent = parent;
   do {
     self.name = faker.company.companyName();
   } while (self.name.length > 15);
@@ -97,7 +98,7 @@ var Customer = function(store) {
   self.registrationCountryMatches = Math.random() >= 0.5;
   self.timeOfCharge = getRandomInt(0,23);
   self.previousPurchases = Math.random()  <= 0.5;
-  self.timeSinceRegistration = Math.random() >= 0.8 ? getRandomInt(0,2160) : 0;
+  self.timeSinceRegistration = Math.random() >= 0.75 ? getRandomInt(0,2160) : 0;
   self.purchaseValue = getRandomInt(1,1000);
   self.freeEmail = Math.random() >= 0.5;
   self.email = faker.internet.email(self.firstName, self.lastName, getRandomFromList(self.freeEmail ? freeEmailProviderList : paidEmailProviderList));
@@ -106,6 +107,7 @@ var Customer = function(store) {
   self.webProxy =  self.countryOfRegistration !== self.countryOfCharge;
   self.ipCountriesMatch = self.countryOfRegistration === self.countryOfCharge;
   self.highRiskCountry = store.riskCountries.includes(self.countryOfCharge);
+  self.criticalTime = self.timeOfCharge < 9 || self.timeOfCharge > 18;
 
   self.prepareData = function() {
     return {
@@ -124,6 +126,8 @@ var Customer = function(store) {
   self.payload = self.prepareData();
 
   self.evaluate = function() {
+    store.parent.showLoading(true);
+    console.log(store.parent.showLoading(true));
     var success = function () {
       console.log("success");
     };
@@ -131,7 +135,7 @@ var Customer = function(store) {
       console.log("error");
     };
 
-    Api.post(self.payload, success, error);
+    // Api.post(self.payload, success, error);
   }
 
 };
@@ -139,9 +143,9 @@ var Customer = function(store) {
 var MainViewModel = function() {
   var self = this;
   self.stores = ko.observableArray([]);
-
+  self.showLoading = ko.observable(false);
   for (let i = 0; i < 3; i++){
-    self.stores()[i] = new Store();
+    self.stores()[i] = new Store(self);
   }
   console.log(self.stores());
 
