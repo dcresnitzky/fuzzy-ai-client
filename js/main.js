@@ -37,7 +37,6 @@ const countryList = [
   "Brasil",
   "Chile",
   "China",
-  "Cidade do Vaticano",
   "Coréia do Sul",
   "EUA",
   "Egito",
@@ -97,8 +96,8 @@ var Customer = function(store) {
   self.avatar = faker.image.avatar();
   self.registrationCountryMatches = Math.random() >= 0.5;
   self.timeOfCharge = getRandomInt(0,23);
-  self.previousPurchases = Math.random()  <= 0.5;
-  self.timeSinceRegistration = Math.random() >= 0.75 ? getRandomInt(0,2160) : 0;
+  self.timeSinceRegistration = Math.random() >= 0.70 ? getRandomInt(0,2160) : 0;
+  self.previousPurchases = self.timeSinceRegistration ? getRandomInt(0,8) : 0;
   self.purchaseValue = getRandomInt(1,1000);
   self.freeEmail = Math.random() >= 0.5;
   self.email = faker.internet.email(self.firstName, self.lastName, getRandomFromList(self.freeEmail ? freeEmailProviderList : paidEmailProviderList));
@@ -111,48 +110,58 @@ var Customer = function(store) {
 
   self.prepareData = function() {
     return {
-      "registration countries match": self.countryOfRegistration === self.countryOfCharge,
+      "registration countries match": self.countryOfRegistration === self.countryOfCharge ? 1 : 0,
       "time of charge": self.timeOfCharge,
       "previous purchases" : self.previousPurchases,
-      "ip countries match": self.ipCountriesMatch,
+      "ip countries match": self.ipCountriesMatch ? 1 : 0,
       "time since registration" : self.timeSinceRegistration,
       "purchase size" : self.purchaseValue,
-      "high risk country" : self.highRiskCountry,
-      "free email" : self.freeEmail,
-      "web proxy" : self.webProxy
+      "high risk country" : self.highRiskCountry ? 1 : 0,
+      "free email" : self.freeEmail ? 1 : 0,
+      "web proxy" : self.webProxy ? 1 : 0
     };
   };
 
-  self.payload = self.prepareData();
+  self.requestSent = ko.observable(false);
+  self.requestResult = ko.observable();
 
   self.evaluate = function() {
+
+    let payload = self.prepareData();
+
     store.parent.showLoading(true);
-    console.log(store.parent.showLoading(true));
-    var success = function () {
-      console.log("success");
+
+    var success = function (data) {
+      self.requestSent(true);
+      self.requestResult(data.Fraudulence);
     };
     var error = function () {
-      console.log("error");
+      alert("Algo deu errado, tente novamente");
     };
 
-    // Api.post(self.payload, success, error);
+    Api.post(payload, success, error);
   }
-
 };
 
 var MainViewModel = function() {
   var self = this;
+
   self.stores = ko.observableArray([]);
-  self.showLoading = ko.observable(false);
+  self.showLoading = ko.observable(true);
+
   for (let i = 0; i < 3; i++){
     self.stores()[i] = new Store(self);
   }
-  console.log(self.stores());
-
 };
 
-ko.applyBindings(new MainViewModel()); // This makes Knockout get to work
+var app = new MainViewModel();
+ko.applyBindings(app); // This makes Knockout get to work
 
 $( document ).ready(function () {
   $('[data-toggle="tooltip"]').tooltip()
 });
+$(window).on("load", function() {
+  app.showLoading(false);
+});
+
+

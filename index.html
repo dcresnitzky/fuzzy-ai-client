@@ -18,7 +18,8 @@
   </head>
 
   <body>
-    <div class="loader" data-bind="visible: showLoading()"></div>
+    <div class="loader" data-bind="visible: showLoading"></div>
+    <div class="overlay" data-bind="visible: showLoading"></div>
 
   <!--[if lte IE 9]>
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
@@ -70,7 +71,7 @@
                 <!--previous purchases-->
                 <!--time since registration-->
                 <!-- ko if: timeSinceRegistration > 0 -->
-                <li><strong>Usuario há:</strong> <span data-bind="text:Math.ceil(timeSinceRegistration/24)"></span> dias</li>
+                <li><strong>Usuario há:</strong> <span data-bind="text:Math.ceil(timeSinceRegistration/24)"></span> dias <span data-bind="text: previousPurchases ? '(Já comprou)' : '(Não comprou)'"></span></li>
                 <!-- /ko -->
                 <!-- ko if: timeSinceRegistration <= 0 -->
                 <li><strong>Usuario novo</strong></li>
@@ -78,7 +79,13 @@
 
               </ul>
             </div>
+            <!-- ko if: !requestSent() -->
             <button type="button" class="btn btn-lg btn-block btn-outline-primary" style="margin-top: 15px;" data-bind="click:evaluate">Realizar o Teste</button>
+            <!-- /ko -->
+            <!-- ko if: requestSent() -->
+            <button type="button" class="btn btn-lg btn-block btn-outline-primary" style="margin-top: 15px;" data-bind="text: requestResult" disabled></button>
+            <!-- /ko -->
+
           </div>
         </div>
 
